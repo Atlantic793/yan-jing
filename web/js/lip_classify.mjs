@@ -7,7 +7,7 @@ const COPY = {
   tooRound: "嘴唇太圆了，往两边拉开",
   notSpread: "嘴唇再往两边拉开",
   needBaseline: "先记下你的自然口型",
-  needTarget: "先选「衣」或「鱼」",
+  needTarget: "先选一个字",
   noface: "请把整张脸放进画面",
   far: "请再靠近一点",
   close: "请稍微离远一点",

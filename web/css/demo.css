@@ -139,28 +139,27 @@ main {
 }
 
 .choices {
-  display: grid;
-  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   width: min(100%, 420px);
 }
 
 .choices button {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  padding: 8px 18px 14px;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  padding: 8px 0 10px;
   border: 1px solid var(--line);
-  border-left: 8px solid transparent;
+  border-left: 6px solid transparent;
   background: var(--paper);
   color: var(--ink);
-  text-align: left;
 }
 
 .choices button b {
   font-family: KaiTi, STKaiti, "楷体", serif;
-  font-size: 84px;
+  font-size: 40px;
   font-weight: 400;
   line-height: 1;
 }
@@ -244,7 +243,7 @@ main {
   main { grid-template-columns: 1fr; justify-items: start; }
   .mirror-col, .stage { width: min(78vw, 360px); }
   .choices { width: 100%; }
-  .choices button b { font-size: 64px; }
+  .choices button b { font-size: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -74,6 +74,12 @@ test("页面和规则文案不越界", () => {
   assert.equal(blob.includes("鱼"), true)
 })
 
+test("练习字对应计划里的圆展，不把鱼和乌放在一起比", () => {
+  const html = readFileSync(join(import.meta.dirname, "..", "web", "index.html"), "utf8")
+  const chars = [...html.matchAll(/data-char="([^"]+)"/g)].map((match) => match[1])
+  assert.deepEqual(chars, ["衣", "西", "叶", "鹅", "鱼", "月", "圆", "波"])
+})
+
 function sourceFiles(dir) {
   const found = []
   for (const name of readdirSync(dir)) {

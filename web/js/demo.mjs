@@ -38,10 +38,11 @@ function setSentence(text) {
   sentenceEl.textContent = text
 }
 
-function selectTarget(next) {
+function selectTarget(next, button) {
   target = next
-  document.querySelector("#pick-spread").classList.toggle("selected", next === "spread")
-  document.querySelector("#pick-round").classList.toggle("selected", next === "round")
+  document.querySelectorAll("[data-lip]").forEach((item) => {
+    item.classList.toggle("selected", item === button)
+  })
   glyph.className = `mouth-glyph ${next === "spread" ? "spread" : "round"}`
   hold.reset(null)
 }
@@ -256,16 +257,17 @@ function toggleFull() {
   document.documentElement.requestFullscreen()
 }
 
-document.querySelector("#pick-spread").addEventListener("click", () => selectTarget("spread"))
-document.querySelector("#pick-round").addEventListener("click", () => selectTarget("round"))
+document.querySelectorAll("[data-lip]").forEach((button) => {
+  button.addEventListener("click", () => selectTarget(button.dataset.lip, button))
+})
 document.querySelector("#baseline").addEventListener("click", startBaseline)
 openCameraButton.addEventListener("click", () => { startCamera() })
 document.querySelector("#attempt").addEventListener("click", recordAttempt)
 document.querySelector("#full").addEventListener("click", toggleFull)
 
 window.addEventListener("keydown", (event) => {
-  if (event.key === "1") selectTarget("spread")
-  if (event.key === "2") selectTarget("round")
+  if (event.key === "1") document.querySelector('[data-char="衣"]').click()
+  if (event.key === "2") document.querySelector('[data-char="鱼"]').click()
   if (event.key === "b" || event.key === "B") startBaseline()
   if (event.key === "n" || event.key === "N") recordAttempt()
   if (event.key === "f" || event.key === "F") toggleFull()
