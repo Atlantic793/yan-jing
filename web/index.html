@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>言镜</title>
+  <link rel="stylesheet" href="./css/demo.css">
+</head>
+<body>
+  <header>
+    <div class="brand">言镜</div>
+    <p class="count" id="count">练习次数 0</p>
+  </header>
+  <p class="preview-banner">界面预演：这不是摄像头识别结果。正式演示请回到摄像头页面。</p>
+  <main>
+    <section class="mirror-col">
+      <p class="kicker">你现在的口型</p>
+      <div class="stage">
+        <canvas id="mouth"></canvas>
+      </div>
+    </section>
+    <section class="card-col">
+      <p class="kicker">要做的动作</p>
+      <div class="choices">
+        <button id="pick-spread" type="button"><b>衣</b><span>嘴角向两边拉开</span></button>
+        <button id="pick-round" type="button"><b>鱼</b><span>嘴唇收圆</span></button>
+      </div>
+      <div id="glyph" class="mouth-glyph idle" hidden></div>
+      <p class="kicker face-label">整张脸</p>
+      <canvas id="face"></canvas>
+      <p class="hint">动作示意。画面不上传，也不录音。</p>
+      <p class="baseline-flag" id="baseline-flag">自然口型：还没记下</p>
+      <div id="camera-help" class="camera-help" hidden>
+        <button id="open-camera" type="button">打开摄像头</button>
+        <p id="camera-help-text"></p>
+      </div>
+      <div class="ops">
+        <button id="baseline" type="button">记下自然口型</button>
+        <button id="attempt" type="button">记一次练习</button>
+        <button id="full" type="button">全屏</button>
+      </div>
+      <p class="keys">B 记下 · 1 衣 · 2 鱼 · N 记一次 · F 全屏</p>
+      <a class="linkish" id="mode-link" href="./?preview=1">界面预演</a>
+    </section>
+  </main>
+  <div class="readout">
+    <p class="sentence" id="sentence">请用启动脚本打开本页</p>
+    <p class="rel" id="rel"></p>
+  </div>
+  <script type="module" src="./js/demo.mjs"></script>
+</body>
+</html>

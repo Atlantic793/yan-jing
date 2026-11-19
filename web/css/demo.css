@@ -1,0 +1,252 @@
+:root {
+  --wall: #c9dde8;
+  --wall-deep: #b7d0de;
+  --ink: #16303c;
+  --quiet: #5c7380;
+  --paper: #f7fbfd;
+  --line: #c5d7e2;
+  --lip: #c23b55;
+  --glass: #b7c9d4;
+  color: var(--ink);
+  background: var(--wall);
+  font-family: "DengXian", "等线", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(#d7e8f0, var(--wall));
+}
+
+button, p, a { font: inherit; }
+
+button, a {
+  cursor: pointer;
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  width: min(1080px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 22px 0 0;
+}
+
+.brand {
+  font-family: KaiTi, STKaiti, "楷体", serif;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.count, .kicker, .hint, .keys, .rel, .baseline-flag {
+  margin: 0;
+}
+
+.count {
+  margin-left: auto;
+  font-size: 16px;
+  color: var(--quiet);
+}
+
+.preview-banner {
+  display: none;
+  width: min(1080px, calc(100% - 48px));
+  margin: 14px auto 0;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+body.preview .preview-banner { display: block; }
+
+main {
+  display: grid;
+  grid-template-columns: auto minmax(280px, 420px);
+  gap: 28px 56px;
+  align-items: center;
+  justify-content: center;
+  width: min(1080px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 18px 0 8px;
+}
+
+.mirror-col { width: min(46vh, 400px); }
+
+.kicker {
+  font-size: 15px;
+  color: var(--quiet);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  margin: 14px 0 0;
+  border: 16px solid var(--paper);
+  border-radius: 50%;
+  background: var(--glass);
+  box-shadow:
+    0 0 0 1px #9db8c6,
+    0 18px 36px rgba(22, 48, 60, 0.1);
+  overflow: hidden;
+}
+
+#mouth {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: scaleX(-1);
+}
+
+.readout {
+  width: min(1080px, calc(100% - 48px));
+  margin: 8px auto 0;
+  padding-bottom: 28px;
+}
+
+.sentence {
+  margin: 0;
+  font-family: KaiTi, STKaiti, "楷体", serif;
+  font-size: clamp(40px, 4.4vw, 64px);
+  font-weight: 400;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.rel {
+  min-height: 1.4em;
+  margin-top: 8px;
+  font-size: 18px;
+  color: var(--quiet);
+}
+
+.card-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.choices {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 420px);
+}
+
+.choices button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 18px 14px;
+  border: 1px solid var(--line);
+  border-left: 8px solid transparent;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+}
+
+.choices button b {
+  font-family: KaiTi, STKaiti, "楷体", serif;
+  font-size: 84px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.choices button span {
+  font-size: 18px;
+}
+
+.choices button.selected {
+  border-left-color: var(--lip);
+}
+
+.choices button.selected b {
+  color: var(--lip);
+}
+
+.face-label { margin-top: 8px; }
+
+#face {
+  width: 168px;
+  height: 126px;
+  display: block;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  transform: scaleX(-1);
+}
+
+.hint, .baseline-flag, .keys {
+  font-size: 15px;
+  color: var(--quiet);
+}
+
+.camera-help {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.camera-help[hidden] { display: none; }
+
+.camera-help p {
+  margin: 0;
+  max-width: 18em;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.camera-help button {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 14px;
+  font-size: 18px;
+}
+
+.ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.ops button {
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 8px 12px;
+  font-size: 16px;
+}
+
+.linkish {
+  color: var(--quiet);
+  font-size: 14px;
+}
+
+.mouth-glyph { display: none; }
+
+@media (max-width: 860px) {
+  header, .preview-banner, main, .readout { width: min(100% - 36px, 1080px); }
+  main { grid-template-columns: 1fr; justify-items: start; }
+  .mirror-col, .stage { width: min(78vw, 360px); }
+  .choices { width: 100%; }
+  .choices button b { font-size: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto; }
+}
