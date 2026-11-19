@@ -58,13 +58,33 @@ test("脸转开时不判口型", () => {
   assert.equal(result.shape, "wait")
 })
 
+test("啊看下颌，爸看闭合，发看下唇，乌和鱼同属圆唇", () => {
+  const baseline = baselineOf()
+  const open = extractLipFeatures(syntheticLandmarks({ chinY: 0.94 }))
+  const shut = featuresOf(0.07, 0.04)
+  assert.equal(attributeLip({ features: open, baseline, target: "open" }).prompt, COPY.openNow)
+  assert.equal(attributeLip({ features: shut, baseline, target: "open" }).prompt, COPY.notOpen)
+
+  const apart = extractLipFeatures(syntheticLandmarks({ innerGap: 0.08 }))
+  const together = featuresOf(0.07, 0.04)
+  assert.equal(attributeLip({ features: apart, baseline, target: "close" }).prompt, COPY.notClose)
+  assert.equal(attributeLip({ features: together, baseline, target: "close" }).prompt, COPY.closeNow)
+
+  const lifted = extractLipFeatures(syntheticLandmarks({ lowerLipY: 0.56 }))
+  assert.equal(attributeLip({ features: lifted, baseline, target: "lift" }).prompt, COPY.liftNow)
+  assert.equal(attributeLip({ features: together, baseline, target: "lift" }).prompt, COPY.notLift)
+
+  const round = featuresOf(0.045, 0.055)
+  assert.equal(attributeLip({ features: round, baseline, target: "round" }).prompt, COPY.roundNow)
+})
+
 test("练习次数与口型无关", () => {
   assert.equal(bumpAttempt(0), 1)
   assert.equal(bumpAttempt(4), 5)
 })
 
 test("页面和规则文案不越界", () => {
-  const banned = ["相似度", "标准口型", "舌位", "得分", "分数", "正确", "错误", "通过", "失败", "模板", "乌", "奖励", "星星", "发音准", "无"]
+  const banned = ["相似度", "标准口型", "舌位", "得分", "分数", "正确", "错误", "通过", "失败", "模板", "奖励", "星星", "发音准", "无"]
   const files = sourceFiles(join(import.meta.dirname, "..", "web"))
   const blob = files.map((file) => readFileSync(file, "utf8")).join("\n")
   for (const word of banned) {
@@ -74,10 +94,21 @@ test("页面和规则文案不越界", () => {
   assert.equal(blob.includes("鱼"), true)
 })
 
-test("练习字对应计划里的圆展，不把鱼和乌放在一起比", () => {
+test("练习字按计划归类，鱼和乌都只记圆唇", () => {
   const html = readFileSync(join(import.meta.dirname, "..", "web", "index.html"), "utf8")
-  const chars = [...html.matchAll(/data-char="([^"]+)"/g)].map((match) => match[1])
-  assert.deepEqual(chars, ["衣", "西", "叶", "鹅", "鱼", "月", "圆", "波"])
+  const pairs = [...html.matchAll(/data-lip="([^"]+)" data-char="([^"]+)"/g)].map((match) => [match[2], match[1]])
+  const kind = Object.fromEntries(pairs)
+  assert.equal(kind["衣"], "spread")
+  assert.equal(kind["叶"], "spread")
+  assert.equal(kind["鱼"], "round")
+  assert.equal(kind["乌"], "round")
+  assert.equal(kind["波"], "round")
+  assert.equal(kind["啊"], "open")
+  assert.equal(kind["爸"], "close")
+  assert.equal(kind["拍"], "close")
+  assert.equal(kind["妈"], "close")
+  assert.equal(kind["发"], "lift")
+  assert.equal(html.includes("舌"), false)
 })
 
 function sourceFiles(dir) {

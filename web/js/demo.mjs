@@ -84,9 +84,17 @@ function smoothFeature(next) {
   miss = 0
   if (!smoothed || !smoothed.ok) smoothed = next
   else {
-    const width = smoothed.width * 0.55 + next.width * 0.45
-    const height = smoothed.height * 0.55 + next.height * 0.45
-    smoothed = { ok: true, width, height, aspect: width / height }
+    const mix = (key) => smoothed[key] * 0.55 + next[key] * 0.45
+    smoothed = {
+      ok: true,
+      width: mix("width"),
+      height: mix("height"),
+      closure: mix("closure"),
+      aspect: mix("aspect"),
+      jaw: mix("jaw"),
+      corner: mix("corner"),
+      lipChin: mix("lipChin"),
+    }
   }
   lastGood = smoothed
   return smoothed

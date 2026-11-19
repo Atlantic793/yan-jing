@@ -8,6 +8,18 @@ const COPY = {
   notSpread: "嘴唇再往两边拉开",
   needBaseline: "先记下你的自然口型",
   needTarget: "先选一个字",
+  openNow: "现在嘴张得比较大",
+  openMore: "嘴还可以再张开一点",
+  notOpen: "嘴张得不够大",
+  closeNow: "现在上下嘴唇碰住了",
+  closeMore: "上下嘴唇还可以再碰紧一点",
+  notClose: "上下嘴唇没碰住",
+  liftNow: "现在下唇抬起来了",
+  liftMore: "下唇还可以再抬一点",
+  notLift: "下嘴唇没碰到上牙",
+  relOpen: "比你的自然口型张得更大",
+  relClose: "比你的自然口型闭得更紧",
+  relLift: "下唇比自然时抬得更高",
   noface: "请把整张脸放进画面",
   far: "请再靠近一点",
   close: "请稍微离远一点",
@@ -35,14 +47,14 @@ function median(values) {
   return sorted[mid]
 }
 
+const FEATURE_KEYS = ["width", "height", "closure", "aspect", "jaw", "corner", "lipChin"]
+
 function baselineFromSamples(samples) {
   const good = samples.filter((sample) => sample && sample.ok)
   if (good.length < 8) return null
-  return {
-    width: median(good.map((sample) => sample.width)),
-    height: median(good.map((sample) => sample.height)),
-    aspect: median(good.map((sample) => sample.aspect)),
-  }
+  const baseline = {}
+  for (const key of FEATURE_KEYS) baseline[key] = median(good.map((sample) => sample[key]))
+  return baseline
 }
 
 function classifyShape(features, baseline) {
@@ -53,6 +65,31 @@ function classifyShape(features, baseline) {
   if (widthRel < 0.95) return "slight-round"
   if (widthRel > 1.06 && aspectRel > 0.95) return "slight-spread"
   return "neutral"
+}
+
+function rel(current, base) {
+  return current / base
+}
+
+function openShape(features, baseline) {
+  const jawRel = rel(features.jaw, baseline.jaw)
+  if (jawRel > 1.15) return "open"
+  if (jawRel > 1.06) return "slight-open"
+  return "shut"
+}
+
+function closeShape(features, baseline) {
+  const closureRel = rel(features.closure, baseline.closure)
+  if (closureRel > 1.45) return "apart"
+  if (closureRel > 1.2) return "slight-closed"
+  return "closed"
+}
+
+function liftShape(features, baseline) {
+  const liftRel = rel(features.lipChin, baseline.lipChin)
+  if (liftRel > 1.18) return "lifted"
+  if (liftRel > 1.08) return "slight-lift"
+  return "low"
 }
 
 function promptFor(target, shape) {
@@ -67,6 +104,21 @@ function promptFor(target, shape) {
     if (shape === "round" || shape === "slight-round") return COPY.tooRound
     return COPY.notSpread
   }
+  if (target === "open") {
+    if (shape === "open") return COPY.openNow
+    if (shape === "slight-open") return COPY.openMore
+    return COPY.notOpen
+  }
+  if (target === "close") {
+    if (shape === "closed") return COPY.closeNow
+    if (shape === "slight-closed") return COPY.closeMore
+    return COPY.notClose
+  }
+  if (target === "lift") {
+    if (shape === "lifted") return COPY.liftNow
+    if (shape === "slight-lift") return COPY.liftMore
+    return COPY.notLift
+  }
   throw new Error(`unknown target: ${target}`)
 }
 
@@ -74,6 +126,9 @@ function relationText(shape) {
   if (shape === "round" || shape === "slight-round") return COPY.relRound
   if (shape === "spread" || shape === "slight-spread") return COPY.relSpread
   if (shape === "neutral") return COPY.relNear
+  if (shape === "open" || shape === "slight-open") return COPY.relOpen
+  if (shape === "closed" || shape === "slight-closed") return COPY.relClose
+  if (shape === "lifted" || shape === "slight-lift") return COPY.relLift
   return ""
 }
 
@@ -87,11 +142,17 @@ function attributeLip({ features, baseline, target }) {
     return { prompt: REASON_COPY[reason] || COPY.noface, shape: "wait", relation: "" }
   }
   if (!baseline) return { prompt: COPY.needBaseline, shape: "wait", relation: "" }
-  if (target !== "round" && target !== "spread") {
-    return { prompt: COPY.needTarget, shape: "wait", relation: "" }
-  }
-  const shape = classifyShape(features, baseline)
+  const known = target === "round" || target === "spread" || target === "open" || target === "close" || target === "lift"
+  if (!known) return { prompt: COPY.needTarget, shape: "wait", relation: "" }
+  const shape = shapeFor(target, features, baseline)
   return { prompt: promptFor(target, shape), shape, relation: relationText(shape) }
+}
+
+function shapeFor(target, features, baseline) {
+  if (target === "open") return openShape(features, baseline)
+  if (target === "close") return closeShape(features, baseline)
+  if (target === "lift") return liftShape(features, baseline)
+  return classifyShape(features, baseline)
 }
 
 function createShapeHold(frames = 4) {
