@@ -6,15 +6,28 @@
   <title>言镜</title>
   <link rel="stylesheet" href="./css/demo.css">
 </head>
-<body>
+<body class="phase-seat">
   <header>
     <div class="brand">言镜</div>
     <p class="count" id="count">练习次数 0</p>
   </header>
   <p class="preview-banner">界面预演：这不是摄像头识别结果。正式演示请回到摄像头页面。</p>
+  <ol class="steps" id="steps">
+    <li data-step="seat" class="on">就位</li>
+    <li data-step="demo">示范</li>
+    <li data-step="follow">跟练</li>
+    <li data-step="pair">并排</li>
+    <li data-step="wrap">收尾</li>
+  </ol>
   <main>
-    <section class="mirror-col">
-      <p class="kicker">你现在的口型</p>
+    <section class="mirror-col" id="action-col" hidden>
+      <p class="kicker" id="action-label">要做的动作 · 1.5 秒</p>
+      <div class="stage">
+        <canvas id="action"></canvas>
+      </div>
+    </section>
+    <section class="mirror-col" id="child-col">
+      <p class="kicker" id="child-label">你现在的口型</p>
       <div class="stage">
         <canvas id="mouth"></canvas>
       </div>
@@ -60,10 +73,14 @@
       </div>
       <div class="ops">
         <button id="baseline" type="button">记下自然口型</button>
+        <button id="follow" type="button" hidden>我来跟</button>
         <button id="attempt" type="button">记一次练习</button>
+        <button id="again" type="button" hidden>再跟一次</button>
+        <button id="slow" type="button" hidden>慢放</button>
+        <button id="done" type="button">今天练完了</button>
         <button id="full" type="button">全屏</button>
       </div>
-      <p class="keys">B 记下 · 1 衣 · 2 鱼 · N 记一次 · F 全屏</p>
+      <p class="keys">B 记下 · 1 衣 · 2 鱼 · N 记一次 · S 慢放 · F 全屏</p>
       <a class="linkish" id="mode-link" href="./?preview=1">界面预演</a>
     </section>
   </main>

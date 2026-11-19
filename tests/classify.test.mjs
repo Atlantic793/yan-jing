@@ -4,6 +4,7 @@ import { join } from "node:path"
 import test from "node:test"
 import { extractLipFeatures, syntheticLandmarks } from "../web/js/lip_geometry.mjs"
 import { COPY, attributeLip, baselineFromSamples, bumpAttempt, classifyShape } from "../web/js/lip_classify.mjs"
+import { DARK_LUMA, LOOP_MS, demoPose, gateLight, lightFromLuma, loopUnit, meanLuma, sessionWrap } from "../web/js/session_flow.mjs"
 
 function featuresOf(rx, ry, noseX = 0.5) {
   return extractLipFeatures(syntheticLandmarks({ rx, ry, noseX }))
@@ -92,6 +93,64 @@ test("页面和规则文案不越界", () => {
   }
   assert.equal(blob.includes("衣"), true)
   assert.equal(blob.includes("鱼"), true)
+})
+
+test("光线不够时拦住，不给口型结论", () => {
+  const dark = gateLight(featuresOf(0.105, 0.035), lightFromLuma(10))
+  const result = attributeLip({ features: dark, baseline: baselineOf(), target: "spread" })
+  assert.equal(dark.reason, "dark")
+  assert.equal(result.shape, "wait")
+  assert.equal(result.prompt, COPY.dark)
+  assert.equal(lightFromLuma(DARK_LUMA).ok, true)
+  assert.equal(lightFromLuma(DARK_LUMA - 1).ok, false)
+  const bright = lightFromLuma(meanLuma(new Uint8ClampedArray([180, 180, 180, 255])))
+  assert.equal(bright.ok, true)
+  assert.equal(gateLight(featuresOf(0.07, 0.04), bright).ok, true)
+  assert.equal(lightFromLuma(meanLuma(new Uint8ClampedArray([10, 10, 10, 255]))).ok, false)
+})
+
+test("示范一圈走到中段就是这个字要的口型，慢放把 1.5 秒拉成 3 秒", () => {
+  const baseline = baselineOf()
+  const peak = (kind) => extractLipFeatures(demoPose(kind, 0.5))
+  assert.equal(attributeLip({ features: peak("spread"), baseline, target: "spread" }).prompt, COPY.spreadNow)
+  assert.equal(attributeLip({ features: peak("round"), baseline, target: "round" }).prompt, COPY.roundNow)
+  assert.equal(attributeLip({ features: peak("open"), baseline, target: "open" }).prompt, COPY.openNow)
+  assert.equal(attributeLip({ features: peak("close"), baseline, target: "close" }).prompt, COPY.closeNow)
+  assert.equal(attributeLip({ features: peak("lift"), baseline, target: "lift" }).prompt, COPY.liftNow)
+  assert.equal(LOOP_MS, 1500)
+  assert.equal(loopUnit(0, false), 0)
+  assert.equal(loopUnit(750, false), 0.5)
+  assert.equal(loopUnit(1500, false), 0)
+  assert.equal(loopUnit(1500, true), 0.5)
+})
+
+test("收尾列出练过的字，并留下出现最多的那一句", () => {
+  const summary = sessionWrap([
+    { char: "衣", prompt: COPY.notSpread },
+    { char: "鱼", prompt: COPY.notRound },
+    { char: "衣", prompt: COPY.notRound },
+  ])
+  assert.deepEqual(summary.chars, ["衣", "鱼"])
+  assert.equal(summary.prompt, COPY.notRound)
+  assert.equal(summary.headline, "今天练了 衣、鱼")
+  const tie = sessionWrap([
+    { char: "啊", prompt: COPY.notOpen },
+    { char: "爸", prompt: COPY.notClose },
+  ])
+  assert.equal(tie.prompt, COPY.notOpen)
+  const empty = sessionWrap([])
+  assert.equal(empty.headline, "今天还没记过练习")
+  assert.equal(empty.prompt, "")
+})
+
+test("练习流程按计划走五步", () => {
+  const html = readFileSync(join(import.meta.dirname, "..", "web", "index.html"), "utf8")
+  const steps = [...html.matchAll(/data-step="([^"]+)"/g)].map((match) => match[1])
+  assert.deepEqual(steps, ["seat", "demo", "follow", "pair", "wrap"])
+  const flow = `${html}\n${readFileSync(join(import.meta.dirname, "..", "web", "js", "demo.mjs"), "utf8")}`
+  for (const word of ["就位", "示范", "跟练", "并排", "收尾", "要做的动作", "刚才那一下", "慢放", "我来跟", "今天练完了", "1.5 秒"]) {
+    assert.equal(flow.includes(word), true, word)
+  }
 })
 
 test("练习字按计划归类，鱼和乌都只记圆唇", () => {

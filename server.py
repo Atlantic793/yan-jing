@@ -4,7 +4,6 @@ import os
 import socket
 import threading
 import webbrowser
-from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -25,9 +24,17 @@ class DemoServer(ThreadingHTTPServer):
         super().server_bind()
 
 
+class DemoHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(ROOT), **kwargs)
+
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
+
 def make_server(port):
-    handler = partial(SimpleHTTPRequestHandler, directory=str(ROOT))
-    return DemoServer((HOST, port), handler)
+    return DemoServer((HOST, port), DemoHandler)
 
 
 def choose_port():
@@ -43,8 +50,8 @@ def main():
     httpd = choose_port()
     url = f"http://{HOST}:{httpd.server_address[1]}/"
     print("言镜演示：", url, flush=True)
-    print("操作：允许摄像头 → 记下自然口型 → 选「衣」或「鱼」→ 口型做明显 → F 全屏", flush=True)
-    print("正式演示不要打开界面预演，不要比较「无」或「乌」", flush=True)
+    print("操作：允许摄像头 → 记下自然口型 → 选字看示范 → 我来跟 → 记一次练习 → 今天练完了 → F 全屏", flush=True)
+    print("正式演示不要打开界面预演。鱼和乌都是圆唇。", flush=True)
     if os.environ.get("YANJING_NO_BROWSER") != "1":
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()
     try:

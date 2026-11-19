@@ -25,6 +25,8 @@ const COPY = {
   close: "请稍微离远一点",
   turn: "请正对镜头",
   mouth: "请把嘴露出来",
+  dark: "光线不够，请到亮一点的地方",
+  clipMiss: "刚才那一下没留住，再跟一次",
   relRound: "比你的自然口型更圆",
   relSpread: "比你的自然口型更宽",
   relNear: "接近你的自然口型",
@@ -38,6 +40,7 @@ const REASON_COPY = {
   close: COPY.close,
   turn: COPY.turn,
   mouth: COPY.mouth,
+  dark: COPY.dark,
 }
 
 function median(values) {

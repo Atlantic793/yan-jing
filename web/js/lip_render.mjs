@@ -124,6 +124,18 @@ function drawFacePip(ctx, source, landmarks) {
   }
 }
 
+function drawStill(ctx, source) {
+  const width = ctx.canvas.width
+  const height = ctx.canvas.height
+  ctx.clearRect(0, 0, width, height)
+  if (!source) {
+    ctx.fillStyle = "#d9d3c7"
+    ctx.fillRect(0, 0, width, height)
+    return
+  }
+  ctx.drawImage(source, 0, 0, width, height)
+}
+
 function fitCanvas(canvas) {
   const rect = canvas.getBoundingClientRect()
   const ratio = Math.min(window.devicePixelRatio || 1, 2)
@@ -135,4 +147,4 @@ function fitCanvas(canvas) {
   }
 }
 
-export { drawMouthView, drawFacePip, fitCanvas }
+export { drawMouthView, drawFacePip, drawStill, fitCanvas }
